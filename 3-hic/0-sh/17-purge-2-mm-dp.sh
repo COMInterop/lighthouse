@@ -1,20 +1,20 @@
 #!/bin/bash
 
-#SBATCH --job-name=12-purge-2-mm-dp
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=168
-#SBATCH --output=12-purge-2-mm-dp.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=17-purge-2-mm-dp
+#SBATCH --output=%x.txt
 
 # Load necessary modules
 
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate greenhill
 
 # Define the base directory
 
-BASE_DIR="/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort"
+BASE_DIR="$DIR/output/9-hic/2-sort"
 
 export BASE_DIR
 
@@ -22,7 +22,7 @@ cd $BASE_DIR || { echo "Failed to change directory to $BASE_DIR"; exit 1; }
 
 # Find directories and parallelize minimap2 tasks
 
-find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
+find . -type d -name "chr*" | xargs -I{} -P $THREADS bash -c '
     DIR={}
     CHR_NAME=$(basename "$DIR")
 
@@ -33,7 +33,7 @@ find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
     	cd $hap
     	echo "PWD is $PWD."
  
-        REF="/data_HPC02/bpike/refs/SODLb.${CHR_NAME}.fasta"
+        REF="/path/to/SODLb.${CHR_NAME}.fasta"
         SCAFFOLDS="${CHR_NAME}-${hap}_scaffolds_renamed.fa" 
         PAIR="${CHR_NAME}-${hap}-yahs"
         PAF="${PAIR}.srt.paf"
@@ -58,7 +58,7 @@ cd $BASE_DIR || { echo "Failed to change directory to $BASE_DIR"; exit 1; }
 
 for DIR in chr*; do
     CHR_NAME=$(basename "$DIR")
-    cd "/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/$CHR_NAME/purge-2/yahs" || { echo "Failed to change directory to $BASE_DIR/$CHR_NAME/purge-2/yahs"; exit 1; }
+    cd "$BASE_DIR/$CHR_NAME/purge-2/yahs" || { echo "Failed to change directory to $BASE_DIR/$CHR_NAME/purge-2/yahs"; exit 1; }
     
     for hap in hap0 hap1; do 
         cd $hap || { echo "Failed to change directory to $hap"; exit 1; }
@@ -67,7 +67,7 @@ for DIR in chr*; do
         PAF="${PAIR}.srt.paf"
         
         if [ -s "$PAF" ]; then
-            /apps/bpike/paf2dotplot/paf2dotplot.r -s -o ${CHR_NAME}-${hap}-no-flip "$PAF" || { echo "paf2dotplot failed for $PAIR"; exit 1; }
+           /path/to/paf2dotplot/paf2dotplot.r -s -o ${CHR_NAME}-${hap}-no-flip "$PAF" || { echo "paf2dotplot failed for $PAIR"; exit 1; }
         else
             [ ! -f "$PAF" ] && echo "Skipping paf2dotplot: PAF file $PAF is missing."
             [ ! -s "$PAF" ] && echo "Skipping paf2dotplot: PAF file $PAF is empty."

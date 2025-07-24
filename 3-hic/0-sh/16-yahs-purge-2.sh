@@ -1,20 +1,20 @@
 #!/bin/bash
 
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=48
-#SBATCH --job-name=11-yahs-purge-2
-#SBATCH --output=11-yahs-purge-2-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=16-yahs-purge-2
+#SBATCH --output=16-yahs-purge-2-log.txt
 
 # Activate the conda environment
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate base
 
 # Define the working directory
-WORKDIR=/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-pr/2-sort
-BAM="/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/a-pri-alt-hic.srt.bam"
-YAHS_APP="/data_HPC02/bpike/apps/yahs/./yahs"
+WORKDIR=$DIR/output/9-hic/per-chr-pr/2-sort
+BAM="$DIR/output/9-hic/a-pri-alt-hic.srt.bam"
+YAHS_APP="/path/to/yahs/./yahs"
 
 # Loop through each chromosome directory
 for CHR_DIR in $WORKDIR/chr{1..9} $WORKDIR/chrX; do

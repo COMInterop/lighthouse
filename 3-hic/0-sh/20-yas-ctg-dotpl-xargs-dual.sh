@@ -1,18 +1,18 @@
 #!/bin/bash
 
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=170
-#SBATCH --job-name=13-yahs-ctg-dotpl-xargs-dual
-#SBATCH --output=13-yahs-ctg-dotpl-xargs-dual.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=20-yahs-ctg-dotpl-xargs-dual
+#SBATCH --output=%x.txt
 
 # Source conda and activate the environment
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate base || { echo "Failed to activate conda environment"; exit 1; }
 
 # Define the base and output directories
-export BASE="/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-new/2-sort"
+export BASE="$DIR/output/9-hic/per-chr-new/2-sort"
 
 # Define a function to process each directory
 process_dir() {
@@ -44,7 +44,7 @@ process_dir() {
             fi
         fi
 
-        /data_HPC02/bpike/apps/paf2dotplot/paf2dotplot.r -c 0.8 -f -s "$PAF_FILE" || { echo "Failed to execute paf2dotplot for $PAIR"; return; }
+        /path/to/paf2dotplot/paf2dotplot.r -c 0.8 -f -s "$PAF_FILE" || { echo "Failed to execute paf2dotplot for $PAIR"; return; }
     else
         echo "Reference file $REF or query file $QUERY does not exist"
     fi

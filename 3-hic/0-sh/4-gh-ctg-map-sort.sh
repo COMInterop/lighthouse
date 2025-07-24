@@ -1,16 +1,16 @@
 #!/bin/bash
 
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=170
-#SBATCH --job-name=8-gh-ctg-map-sort
-#SBATCH --output=8-gh-ctg-map-sort-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=4-gh-ctg-map-sort
+#SBATCH --output=%x.txt
 
-BASE_DIR="/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort"
-OUT="pr"
+BASE_DIR="$DIR/output/9-hic/2-sort"
+OUT="sdb"
 
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate greenhill
 
 export BASE_DIR OUT

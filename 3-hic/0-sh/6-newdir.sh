@@ -1,15 +1,16 @@
 #!/bin/bash
 
-#SBATCH --job-name=8.6-newdir
-#SBATCH --partition=debug
+
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=48
-#SBATCH --output=8.6-newdir-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=6-newdir
+#SBATCH --output=%x.txt
 
 # Load necessary modules
 
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 if conda activate base; then
     echo "Successfully activated conda environment"
 else
@@ -19,7 +20,7 @@ fi
 
 # Define the base directory
 
-BASE_DIR="/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort"
+BASE_DIR="$DIR/output/9-hic/2-sort"
 if cd "$BASE_DIR"; then
     echo "Changed directory to $BASE_DIR"
 else
@@ -52,17 +53,17 @@ else
 fi
 
     for hap in hap0 hap1; do 
-        #REF="PR-${CHR_NAME}.fasta"
+        REF="sdb-${CHR_NAME}.fasta"
         CONTIGS="${CHR_NAME}-${hap}-contigs.fasta"
         PAIR="${CHR_NAME}-$hap"
         PAF="${PAIR}.srt.paf"
         
-        #if cp "${PAF}.pdf" purge-1; then
-         #   echo "Copied ${PAF}.pdf to purge-1"
-        #else
-         #   echo "Failed to copy ${PAF}.pdf to purge-1" >&2
-         #   continue
-        #fi
+        if cp "${PAF}.pdf" purge-1; then
+            echo "Copied ${PAF}.pdf to purge-1"
+        else
+            echo "Failed to copy ${PAF}.pdf to purge-1" >&2
+            continue
+        fi
         
         if sort -u "gh/${CHR_NAME}-${hap}-contigs.txt" -o "purge-1/${CHR_NAME}-${hap}-contigs-revised-1.txt"; then
             echo "Copied ${CHR_NAME}-${hap}-contigs.txt to purge-1/${CHR_NAME}-${hap}-contigs-revised-1.txt"

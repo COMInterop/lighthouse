@@ -1,18 +1,19 @@
 #!/bin/bash
 
-#SBATCH --job-name=8.7-minimap-2
-#SBATCH --partition=debug
+
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=48
-#SBATCH --output=8.7-minimap-2-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=13-purge-2-extract
+#SBATCH --output=%x.txt
 
 # Load necessary modules
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate base
 
 # Define the base directory
-BASE_DIR="/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-pr/2-sort"
+BASE_DIR="$DIR/output/9-hic/per-chr-pr/2-sort"
 cd $BASE_DIR
 
 # Sequential processing for awk and subsequent parts
@@ -54,7 +55,7 @@ find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
     CHR_NAME=$(basename "$DIR")
 
     for hap in hap0 hap1; do 
-        BASE_DIR="/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-pr/2-sort"
+        BASE_DIR="$DIR/output/9-hic/per-chr-pr/2-sort"
         REF="$BASE_DIR/${CHR_NAME}/PR-${CHR_NAME}.fasta"
         CONTIGS="${CHR_NAME}-${hap}-contigs-revised-1.fasta"
         PAIR="${CHR_NAME}-${hap}-revised-1"
@@ -82,19 +83,17 @@ cd $BASE_DIR
 for DIR in chr*; do
     
     CHR_NAME=$(basename "$DIR")
-    cd "/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-pr/2-sort/$CHR_NAME/purge-2"
+    cd "$DIR/output/9-hic/per-chr-pr/2-sort/$CHR_NAME/purge-2"
     
     for hap in hap0 hap1; do 
         PAIR="${CHR_NAME}-${hap}-revised-1"
         PAF="${PAIR}.srt.paf"
         
         if [ -s "$PAF" ]; then
-            /apps/bpike/paf2dotplot/paf2dotplot.r -s -f "$PAF"
+            /path/to/paf2dotplot/paf2dotplot.r -s -f "$PAF"
         else
             [ ! -f "$PAF" ] && echo "Skipping paf2dotplot: PAF file $PAF is missing."
             [ ! -s "$PAF" ] && echo "Skipping paf2dotplot: PAF file $PAF is empty."
         fi
     done
 done
-
-/apps/bpike/paf2dotplot/paf2dotplot.r -s -f /data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-pr/2-sort/chr1/purge-2/yahs/hap1/chr1-hap1-revised-2.srt.paf

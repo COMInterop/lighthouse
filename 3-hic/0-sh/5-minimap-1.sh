@@ -1,21 +1,21 @@
 #!/bin/bash
 
-#SBATCH --job-name=8.5-minimap-1
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=170
-#SBATCH --output=8.5-minimap-1-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=5-minimap-1
+#SBATCH --output=%x.txt
 
 # Load necessary modules
 
 echo "Loading conda environment..."
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate greenhill
 
 # Define the base directory
 
-BASE_DIR="/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort"
+BASE_DIR="$DIR/output/9-hic/2-sort"
 echo "Changing directory to $BASE_DIR"
 cd $BASE_DIR || { echo "Failed to change directory to $BASE_DIR"; exit 1; }
 
@@ -24,7 +24,7 @@ cd $BASE_DIR || { echo "Failed to change directory to $BASE_DIR"; exit 1; }
 export BASE_DIR
 
 echo "Finding directories and parallelizing minimap2 tasks..."
-find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
+find . -type d -name "chr*" | xargs -I{} -P $THREADS bash -c '
     DIR={}
     echo "Processing directory $DIR"
     cd "$DIR" || { echo "Failed to change directory to $DIR"; exit 1; }
@@ -33,7 +33,7 @@ find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
 
     for hap in hap0 hap1; do 
         echo "Processing haplotype $hap"
-        REF="/data_HPC02/bpike/refs/SODLb.${CHR_NAME}.fasta"
+        REF="/path/to/SODLb.${CHR_NAME}.fasta"
         CONTIGS="${CHR_NAME}-${hap}-contigs.fasta"
         PAIR="${CHR_NAME}-$hap"
         PAF="${PAIR}.srt.paf"    
@@ -66,7 +66,7 @@ find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
 
         if [ -s "$PAF" ]; then
             echo "Running paf2dotplot.r for $PAF..."
-            /apps/bpike/paf2dotplot/paf2dotplot.r -s -f -m 5000 -q 20000 -o ${PAIR}-m5k-q20k "$PAF"
+            /path/to/paf2dotplot/paf2dotplot.r -s -f -m 5000 -q 20000 -o ${PAIR}-m5k-q20k "$PAF"
             if [ $? -ne 0 ]; then
                 echo "paf2dotplot.r command failed for $PAF"
                 exit 1

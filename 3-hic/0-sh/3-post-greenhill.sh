@@ -1,19 +1,19 @@
 #!/bin/bash
 
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=48
-#SBATCH --job-name=7-post-greenhill
-#SBATCH --output=7-post-greenhill-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=3-post-greenhill
+#SBATCH --output=%x.txt
 
 # Define the base directory where the chromosome folders are located
 
-BASE_DIR="/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort"
+BASE_DIR="$DIR/output/9-hic/2-sort"
 
 # Source conda and activate the environment
 
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate greenhill
 
 # Navigate to the base directory

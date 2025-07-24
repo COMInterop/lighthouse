@@ -1,18 +1,18 @@
 #!/bin/bash
 
-#SBATCH --job-name=9.1-minimap
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=170
-#SBATCH --output=9.1-minimap-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=9-minimap
+#SBATCH --output=%x.txt
 
 # Load necessary modules
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate base
 
 # Define the base directory
-BASE_DIR="/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-pr/2-sort"
+BASE_DIR="$DIR/output/9-hic/per-chr-pr/2-sort"
 cd $BASE_DIR
 
 
@@ -27,7 +27,7 @@ find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
 
     for hap in hap0 hap1; do 
     	cd $DIR/purge-1/yahs/$hap
-        BASE_DIR="/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-pr/2-sort"
+        BASE_DIR="$DIR/output/9-hic/per-chr-pr/2-sort"
         REF="$BASE_DIR/${CHR_NAME}/PR-${CHR_NAME}.fasta"
         CONTIGS="${CHR_NAME}-${hap}_scaffolds_final.fa"
         PAIR="${CHR_NAME}-${hap}-revised-1-scaffolds"
@@ -54,7 +54,7 @@ cd $BASE_DIR
 for DIR in chr*; do
     
     CHR_NAME=$(basename "$DIR")
-    cd "/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-pr/2-sort/$CHR_NAME/purge-2"
+    cd "$DIR/output/9-hic/per-chr-pr/2-sort/$CHR_NAME/purge-2"
     
     for hap in hap0 hap1; do 
     	cd purge-1/yahs/$hap

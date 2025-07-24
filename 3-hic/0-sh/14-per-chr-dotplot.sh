@@ -1,18 +1,18 @@
 #!/bin/bash
 
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=48
-#SBATCH --job-name=11-per-chr-dotplot
-#SBATCH --output=11-per-chr-dotplot-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=14-per-chr-dotplot
+#SBATCH --output=%x.txt
 
 # Source conda and activate the environment
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate base
 
 # Define the base and output directories
-BASE="/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-new/2-sort"
+BASE="$DIR/output/9-hic/per-chr-new/2-sort"
 
 # Change to the base directory
 cd $BASE || { echo "Failed to change directory to $BASE"; exit 1; }
@@ -51,10 +51,10 @@ for DIR in chr*; do
     
     REF="$BASE/$DIR/SODLb-$CHR.fasta"
     QUERY="$CHR-dual.fasta"
-    PAIR="sodlb-a-$CHR-dual"
+    PAIR="sodlb-$CHR-dual"
     
     if [ -f "$REF" ] && [ -f "$QUERY" ]; then
-        minimap2 -x asm5 -k19 -w30 -t48 -K100g -2 "$REF" "$QUERY" | sort -k6,6 -k8,8n > "$PAIR.srt.paf" && ~/paf2dotplot/paf2dotplot.r -f -s "$PAIR.srt.paf" || { echo "Failed to execute minimap2 or paf2dotplot for $PAIR"; continue; }
+        minimap2 -x asm5 -k19 -w30 -t48 -K100g -2 "$REF" "$QUERY" | sort -k6,6 -k8,8n > "$PAIR.srt.paf" && /path/to/paf2dotplot/paf2dotplot.r -f -s "$PAIR.srt.paf" || { echo "Failed to execute minimap2 or paf2dotplot for $PAIR"; continue; }
     else
         echo "Reference file $REF or query file $QUERY does not exist"
     fi

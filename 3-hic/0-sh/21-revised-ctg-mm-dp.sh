@@ -1,18 +1,18 @@
 #!/bin/bash
 
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=170
-#SBATCH --job-name=15-revised-ctg-mm-dp
-#SBATCH --output=15-revised-ctg-mm-dp-log.txt
+#SBATCH --cpus-per-task=
+#SBATCH --job-name=21-revised-ctg-mm-dp
+#SBATCH --output=%x.txt
 
 # Source conda and activate the environment
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate base || { echo "Failed to activate conda environment"; exit 1; }
 
 # Define the base directory
-export BASE="/data_HPC02/bpike/lh/a/drafts/pecat/21dic2023/output/9-hic/per-chr-new/2-sort"
+export BASE="$DIR/output/9-hic/per-chr-new/2-sort"
 
 # Function to perform seqkit grep
 perform_seqkit_grep() {
@@ -107,7 +107,7 @@ generate_dotplots() {
         PAIR="sdb-${CHR}-${HAP}-purged"
         PAF="${PAIR}.srt.paf"
         if [ -f "${PAF}" ] && [ -s "${PAF}" ]; then
-            /data_HPC02/bpike/apps/paf2dotplot/paf2dotplot.r -f -s "${PAF}" || { echo "Failed to execute paf2dotplot for ${PAIR}"; continue; }
+            /path/to/paf2dotplot/paf2dotplot.r -f -s "${PAF}" || { echo "Failed to execute paf2dotplot for ${PAIR}"; continue; }
         fi
     done
 }

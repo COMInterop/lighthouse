@@ -142,10 +142,10 @@ echo -e "\nBEGIN 2-HIC-DIP-MAP\n"
 
 # Set mapping variables
 
-DRAFT=/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/8-polish/pri-alt/ntedit/lh-b-ntedit.fasta
-R1=/data_HPC02/bpike/lh/b/fq/pe150/hic/Casat_El.Chapo_Leaf-1_220330_HiC2_230310-trim-1.fastq
-R2=/data_HPC02/bpike/lh/b/fq/pe150/hic/Casat_El.Chapo_Leaf-1_220330_HiC2_230310-trim-2.fastq
-GT=b-pri-alt
+DRAFT=$DIR/output/8-polish/pri-alt/ntedit/ntedit.fasta
+R1=/path/to/hic-r1.fastq
+R2=/path/to/hic-r2.fastq
+GT=pri-alt
 
 # Conditionally index the $DRAFT
 
@@ -157,7 +157,7 @@ fi
 
 # Set base directory
 
-BASE_DIR=/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic
+BASE_DIR=$DIR/output/9-hic
 mkdir -p $BASE_DIR/1-map/hic
 cd $BASE_DIR/1-map/hic
 
@@ -292,8 +292,8 @@ echo -e "\nBEGIN 4-ONT-DIP-MAP\n"
 
 # Set mapping variables
 
-DRAFT=/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/8-polish/pri-alt/ntedit/lh-b-ntedit.fasta
-READS=/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/1-correct/corrected_reads.fasta
+DRAFT=$DIR/output/8-polish/pri-alt/ntedit/ntedit.fasta
+READS=$DIR/output/1-correct/corrected_reads.fasta
 
 # Function to check command success
 check_command() {
