@@ -20,3 +20,5 @@ Lastly, the YaHS scaffolds are aligned to the reference, which permits discardin
 
 This pipeline is not straightforward to use and I apologize for that. If you have R10 reads you're probably better off using Hifiasm or Verkko. But if you want to make dual assemblies from old R9 reads this one does work pretty good. 
 
+## Software required
+
