@@ -25,14 +25,19 @@ This pipeline is not straightforward to use and I apologize for that. If you hav
 ## Conda packages (recommend each in its own environment):
 
 PECAT
+
 Clair3
+
 ntEdit
+
 HapHiC
+
 Greenhill
 
 ## Others:
 
-paf2dotplot (https://github.com/moold/paf2dotplot)(
+paf2dotplot (https://github.com/moold/paf2dotplot)
+
 YaHS (https://github.com/c-zhou/yahs)
 
 
