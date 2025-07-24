@@ -24,11 +24,11 @@ This pipeline is not straightforward to use and I apologize for that. If you hav
 
 ## Conda packages (recommend each in its own environment):
 
-PECAT
-Clair3
-ntEdit
-HapHiC
-Greenhill
+PECAT (https://github.com/lemene/PECAT)
+Clair3 (https://github.com/HKU-BAL/Clair3)
+ntEdit (https://github.com/bcgsc/ntEdit)
+HapHiC (https://github.com/zengxiaofei/HapHiC)
+Greenhill (https://github.com/ShunOuchi/GreenHill)
 
 ## Others:
 
