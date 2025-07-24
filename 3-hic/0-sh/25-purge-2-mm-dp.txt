@@ -1,0 +1,218 @@
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr2/purge-2/yahs/hap0.
+Skipping minimap2: PAF file chr2-hap0-yahs.srt.paf already exists and is non-zero.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr1/purge-2/yahs/hap0.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr3/purge-2/yahs/hap0.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr2/purge-2/yahs/hap1.
+Skipping minimap2: PAF file chr1-hap0-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr3-hap0-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr2-hap1-yahs.srt.paf already exists and is non-zero.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr3/purge-2/yahs/hap1.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr4/purge-2/yahs/hap0.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr1/purge-2/yahs/hap1.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr6/purge-2/yahs/hap0.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr5/purge-2/yahs/hap0.
+Skipping minimap2: PAF file chr3-hap1-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr4-hap0-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr1-hap1-yahs.srt.paf already exists and is non-zero.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr4/purge-2/yahs/hap1.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chrX/purge-2/yahs/hap0.
+Skipping minimap2: PAF file chr6-hap0-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr4-hap1-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr5-hap0-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chrX-hap0-yahs.srt.paf already exists and is non-zero.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr9/purge-2/yahs/hap0.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr6/purge-2/yahs/hap1.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr5/purge-2/yahs/hap1.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chrX/purge-2/yahs/hap1.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr7/purge-2/yahs/hap0.
+Skipping minimap2: PAF file chr5-hap1-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr7-hap0-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr6-hap1-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chrX-hap1-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr9-hap0-yahs.srt.paf already exists and is non-zero.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr8/purge-2/yahs/hap0.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr9/purge-2/yahs/hap1.
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr7/purge-2/yahs/hap1.
+Skipping minimap2: PAF file chr7-hap1-yahs.srt.paf already exists and is non-zero.
+Skipping minimap2: PAF file chr9-hap1-yahs.srt.paf already exists and is non-zero.
+[M::mm_idx_gen::1.533*1.00] collected minimizers
+[M::mm_idx_gen::1.814*1.74] sorted minimizers
+[M::main::1.814*1.74] loaded/built the index for 1 target sequence(s)
+[M::mm_mapopt_update::1.907*1.71] mid_occ = 242
+[M::mm_idx_stat] kmer size: 19; skip: 19; is_hpc: 0; #seq: 1
+[M::mm_idx_stat::1.994*1.68] distinct minimizers: 3374639 (88.91% are singletons); average occurrences: 1.602; average spacing: 9.959; total length: 53842000
+[M::worker_pipeline::427.828*1.28] mapped 2 sequences
+[M::main] Version: 2.26-r1175
+[M::main] CMD: minimap2 -x asm5 -t16 -K100g --cs --eqx --secondary=no /data_HPC02/bpike/refs/SODLb.chr8.fasta chr8-hap0_scaffolds_renamed.fa
+[M::main] Real time: 427.874 sec; CPU: 546.687 sec; Peak RSS: 5.176 GB
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr8/purge-2/yahs/hap1.
+[M::mm_idx_gen::1.467*1.00] collected minimizers
+[M::mm_idx_gen::1.741*1.75] sorted minimizers
+[M::main::1.741*1.75] loaded/built the index for 1 target sequence(s)
+[M::mm_mapopt_update::1.831*1.71] mid_occ = 242
+[M::mm_idx_stat] kmer size: 19; skip: 19; is_hpc: 0; #seq: 1
+[M::mm_idx_stat::1.921*1.68] distinct minimizers: 3374639 (88.91% are singletons); average occurrences: 1.602; average spacing: 9.959; total length: 53842000
+[M::worker_pipeline::424.436*1.50] mapped 4 sequences
+[M::main] Version: 2.26-r1175
+[M::main] CMD: minimap2 -x asm5 -t16 -K100g --cs --eqx --secondary=no /data_HPC02/bpike/refs/SODLb.chr8.fasta chr8-hap1_scaffolds_renamed.fa
+[M::main] Real time: 424.487 sec; CPU: 638.274 sec; Peak RSS: 6.077 GB
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr1/purge-2/yahs/hap0.
+
+Number of alignments: 8083
+Number of query sequences: 11
+
+After filtering... Number of alignments: 1406
+After filtering... Number of query sequences: 4
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr1/purge-2/yahs/hap1.
+
+Number of alignments: 7773
+Number of query sequences: 9
+
+After filtering... Number of alignments: 1380
+After filtering... Number of query sequences: 4
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr2/purge-2/yahs/hap0.
+
+Number of alignments: 9379
+Number of query sequences: 2
+
+After filtering... Number of alignments: 1545
+After filtering... Number of query sequences: 1
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr2/purge-2/yahs/hap1.
+
+Number of alignments: 9224
+Number of query sequences: 2
+
+After filtering... Number of alignments: 1446
+After filtering... Number of query sequences: 2
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr3/purge-2/yahs/hap0.
+
+Number of alignments: 7465
+Number of query sequences: 5
+
+After filtering... Number of alignments: 1491
+After filtering... Number of query sequences: 3
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr3/purge-2/yahs/hap1.
+
+Number of alignments: 7060
+Number of query sequences: 2
+
+After filtering... Number of alignments: 1416
+After filtering... Number of query sequences: 2
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr4/purge-2/yahs/hap0.
+
+Number of alignments: 6995
+Number of query sequences: 4
+
+After filtering... Number of alignments: 1523
+After filtering... Number of query sequences: 2
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr4/purge-2/yahs/hap1.
+
+Number of alignments: 7241
+Number of query sequences: 5
+
+After filtering... Number of alignments: 1502
+After filtering... Number of query sequences: 3
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr5/purge-2/yahs/hap0.
+
+Number of alignments: 10815
+Number of query sequences: 2
+
+After filtering... Number of alignments: 1550
+After filtering... Number of query sequences: 1
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr5/purge-2/yahs/hap1.
+
+Number of alignments: 9860
+Number of query sequences: 3
+
+After filtering... Number of alignments: 1387
+After filtering... Number of query sequences: 1
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr6/purge-2/yahs/hap0.
+
+Number of alignments: 6269
+Number of query sequences: 4
+
+After filtering... Number of alignments: 1122
+After filtering... Number of query sequences: 3
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr6/purge-2/yahs/hap1.
+
+Number of alignments: 6010
+Number of query sequences: 6
+
+After filtering... Number of alignments: 1066
+After filtering... Number of query sequences: 5
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr7/purge-2/yahs/hap0.
+
+Number of alignments: 5468
+Number of query sequences: 4
+
+After filtering... Number of alignments: 1101
+After filtering... Number of query sequences: 4
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr7/purge-2/yahs/hap1.
+
+Number of alignments: 4948
+Number of query sequences: 4
+
+After filtering... Number of alignments: 1013
+After filtering... Number of query sequences: 2
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr8/purge-2/yahs/hap0.
+
+Number of alignments: 5622
+Number of query sequences: 2
+
+After filtering... Number of alignments: 1165
+After filtering... Number of query sequences: 2
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr8/purge-2/yahs/hap1.
+
+Number of alignments: 5682
+Number of query sequences: 4
+
+After filtering... Number of alignments: 1162
+After filtering... Number of query sequences: 2
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr9/purge-2/yahs/hap0.
+
+Number of alignments: 7886
+Number of query sequences: 2
+
+After filtering... Number of alignments: 1197
+After filtering... Number of query sequences: 2
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chr9/purge-2/yahs/hap1.
+
+Number of alignments: 7641
+Number of query sequences: 2
+
+After filtering... Number of alignments: 1198
+After filtering... Number of query sequences: 2
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chrX/purge-2/yahs/hap0.
+
+Number of alignments: 11741
+Number of query sequences: 3
+
+After filtering... Number of alignments: 1932
+After filtering... Number of query sequences: 1
+
+PWD is /data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic/2-sort/chrX/purge-2/yahs/hap1.
+
+Number of alignments: 11486
+Number of query sequences: 7
+
+After filtering... Number of alignments: 1900
+After filtering... Number of query sequences: 2
+
