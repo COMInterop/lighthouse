@@ -26,7 +26,7 @@ echo -e "\n1-CTG-DIP-SORT\n"
 
 # Set base directory
 
-BASE_DIR=/data_HPC02/bpike/lh/b/drafts/pecat/25dic2023/output/9-hic
+BASE_DIR=$DIR/output/9-hic
 mkdir -p $BASE_DIR/1-map/ctg
 cd $BASE_DIR/1-map/ctg
 

@@ -6,7 +6,7 @@ Here, you may find the code used to make diploid Cannabis assemblies from ultra-
 
 In re: HMW DNA, our samples were prepared from isolated nuclei, and then size-selected above 50kb on the Blue Pippin. You should also use the Blue Pippin. If you don't have access to one, there are selective precipitation kits that eliminate some short fragments. But the Blue Pippin is much more effective. 
 
-The contigs are created with PECAT, which does haplotype-aware error correction, apparently not as well as HERRO, but without needing GPU. (If you have GPU, you should probably use HERRO first.) We include a sample config file which has comments on the optimized parameters. You will need to remove the #comment lines prior from the .cfg prior to using it. 
+The contigs are created with PECAT, which does haplotype-aware error correction, apparently not as well as HERRO, but without needing GPU. (If you have GPU, you should probably use HERRO first.) We include a sample config file which has comments on the optimized parameters. You will need to remove the #comment lines from the .cfg prior to using it. 
 
 Once you have diploid contigs, the tricky bit is phasing them with Hi-C libraries. Here, we begin by binning psuedohaploid contigs among chromosome using a reference, and then assembling them to pseudomolecules with HapHiC. Next, dual contigs are binned among the pseudohaps to create 10 piles of contigs. Each pile is then phased, frequently to chromosome scale, with GreenHill. Greenhill advances the theory of Falcon-Phase, and also incorporates the long reads. It is also able to incorporate a typical paired-end library, but we have not done so. The paper is worth reading: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-03006-8
 
@@ -26,6 +26,8 @@ This pipeline is not straightforward to use and I apologize for that. If you hav
 
 PECAT (https://github.com/lemene/PECAT)
 
+purge_haplotigs (https://bitbucket.org/mroachawri/purge_haplotigs/src/master/)
+
 Clair3 (https://github.com/HKU-BAL/Clair3)
 
 ntEdit (https://github.com/bcgsc/ntEdit)
@@ -34,12 +36,34 @@ HapHiC (https://github.com/zengxiaofei/HapHiC)
 
 Greenhill (https://github.com/ShunOuchi/GreenHill)
 
+You may also like to install the BBMap package (https://archive.jgi.doe.gov/data-and-tools/software-tools/bbtools/) into these environments in order to perform frequent sanity checks with its stats.sh utility. 
+
 
 ## Others:
 
 paf2dotplot (https://github.com/moold/paf2dotplot)
 
 YaHS (https://github.com/c-zhou/yahs)
+
+# Instructions
+
+All scripts have the placeholder $DIR to indicate the directory where PECAT runs. If you use the stock output of 'output', the numbered output folders will therefore appear in $DIR/output. PECAT inherently generates folders 1 through 6, and these scripts will add 7-purge-haps, 8-polish, 9-hic, and 10-chromos.  
+
+## Assembling with PECAT and polishing 
+
+These scripts are in the folder 1-pecat, and are self-explanatory. After assembling with 1-pecat.sh, purge the haplotigs from the primary and alternate assemblies with 2-purge-haps-1.sh and 3-purge-haps-2.sh. In between you will need to pick thresholds for LO, MED, and HI coverage, as described in the instructions for purge_haplotigs.
+
+Next, you may use Clair3 to polish two times with short reads, if you have them. Scripts 4-clair3-ilmn-1.sh and 5-clair3-ilmn-2.sh are written for this purpose.
+
+Lastly, with 6-ntedit.sh you may polish 4 times with ntEdit, using kmers derived from short reads. We use 40-mers and 26-mers, and then repeat. As noted in the script, the new version of ntEdit (v2.2.1) uses different syntax, and appears to be more advanced, but we have not tested it. 
+
+## Making pseudohaploid reference chromosomes
+
+This scripts are in the folder 2-pseudohap-ref. The essential idea is that the intermediate, pre-phased contigs (in PECAT's 3-assemble folder) are arranged into linkage groups after binning against a reference, in this case Sour Diesel B, from the Salk Institute Cannabis Pangenome project. Each chromosome's are arranged into pseudomolecules with HapHiC, which runs 10 times, once for each chromosome, to avoid megascaffolds. This structure is then used to bin the dual contigs, which are shorter.
+
+## Phasing dual contigs with GreenHill
+
+The scripts which accomplish this task are in the 3-hic folder. They number 23, and surely could be condensed into fewer, but this arrangement helps to guarantee that each step has completed correctly before proceeding. These scripts have dummy SLURM headers that may be modified or ignored. In some cases, two versions of the same script are provided, where one runs serially and the other runs in parallel with xargs.  You will need to revise each of these scripts to provide appropriate paths for your filesystem. They were all written by ChatGPT and, if you should have problems with them, I suggest asking ChatGPT first, as it codes much better than I do. However, if you like, I will endeavour to assist where I can. 
 
 
 

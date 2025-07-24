@@ -19,7 +19,7 @@ cd $BASE_DIR || { echo "Failed to change directory to $BASE_DIR"; exit 1; }
 
 # Parallelize the mapping of contigs to Greenhill scaffolds
 
-find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
+find . -type d -name "chr*" | xargs -I{} -P $THREADS bash -c '
     DIR={}
     cd $BASE_DIR/$DIR/gh || { echo "Failed to change directory to $BASE_DIR/$DIR/gh"; exit 1; }
     CHR_NAME=$(basename "$DIR")
