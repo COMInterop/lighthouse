@@ -47,7 +47,7 @@ YaHS (https://github.com/c-zhou/yahs)
 
 # Instructions
 
-All scripts have the placeholder $DIR to indicate the directory where PECAT runs. If you use the stock output of 'output', the numbered output folders will therefore appear in $DIR/output. PECAT inherently generates folders 1 through 6, and these scripts will add 7-purge-haps, 8-polish, 9-hic, and 10-chromos.  
+All scripts have the placeholder $DIR to indicate the directory where PECAT runs. If you use the stock project title of 'output' in the .cfg, the numbered output folders will therefore appear in $DIR/output. PECAT inherently generates folders 1 through 6, and these scripts will add 7-purge-haps, 8-polish, 9-hic, and 10-chromos.  
 
 ## Assembling with PECAT and polishing 
 
@@ -59,11 +59,13 @@ Lastly, with 6-ntedit.sh you may polish 4 times with ntEdit, using kmers derived
 
 ## Making pseudohaploid reference chromosomes
 
-This scripts are in the folder 2-pseudohap-ref. The essential idea is that the intermediate, pre-phased contigs (in PECAT's 3-assemble folder) are arranged into linkage groups after binning against a reference, in this case Sour Diesel B, from the Salk Institute Cannabis Pangenome project. Each chromosome's are arranged into pseudomolecules with HapHiC, which runs 10 times, once for each chromosome, to avoid megascaffolds. This structure is then used to bin the dual contigs, which are shorter.
+This scripts are in the folder 2-pseudohap-ref. The concept is that the intermediate, pre-phased contigs (in PECAT's 3-assemble folder) are arranged into linkage groups after binning against a reference, in this case Sour Diesel B, from the Salk Institute Cannabis Pangenome project. Each chromosome's are arranged into pseudomolecules with HapHiC, which runs 10 times, once for each chromosome, to avoid megascaffolds. This structure, which contains both the primary and alternate contigs of the initial draft, is then used to bin the dual contigs, which are shorter.
 
 ## Phasing dual contigs with GreenHill
 
 The scripts which accomplish this task are in the 3-hic folder. They number 23, and surely could be condensed into fewer, but this arrangement helps to guarantee that each step has completed correctly before proceeding. These scripts have dummy SLURM headers that may be modified or ignored. In some cases, two versions of the same script are provided, where one runs serially and the other runs in parallel with xargs.  You will need to revise each of these scripts to provide appropriate paths for your filesystem. They were all written by ChatGPT and, if you should have problems with them, I suggest asking ChatGPT first, as it codes much better than I do. However, if you like, I will endeavour to assist where I can. 
+
+The pipeline requires manual evaluation at several points. After 6-newdir.sh completes, there will be a list of contigs per haplotype, to be found at $DIR/output/9-hic/2-sort/{CHR_NAME}/purge-1/${CHR_NAME}-${hap}-contigs-revised-1.txt. This list will be used by 7-minimap-2.sh to produce a dotplot of the contigs for each haplotype arranged to the reference chromosome. Your task, as the human, will be to view the two dotplots per chromosome, side-by-side, and decide which contigs need to be relocated from one haplotype to the other, and which contigs are scrap duplicates. These revisions will ned to be made manually to the file ${CHR_NAME}-${hap}-contigs-revised-2.txt, which provides a list or corrected contigs to 8-yahs.sh for scaffolding. With 10 chromosomes and 2 haplotypes, there will, therefore, be 20 files to be edited prior to advancing. 
 
 
 

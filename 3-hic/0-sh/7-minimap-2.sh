@@ -48,7 +48,7 @@ done
 # Find directories and parallelize minimap2 tasks
 cd $BASE_DIR
 
-find . -type d -name "chr*" | xargs -I{} -P170 bash -c '
+find . -type d -name "chr*" | xargs -I{} -P $THREADS bash -c '
     DIR={}
     mkdir -p $DIR/purge-2
     cd $DIR/purge-1
