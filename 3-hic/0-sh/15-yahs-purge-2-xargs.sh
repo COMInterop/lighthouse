@@ -46,7 +46,7 @@ export -f run_yahs
 export YAHS_APP BAM
 
 # Loop through each chromosome directory and find haplotype files
-find $WORKDIR/chr{1..9} $WORKDIR/chrX -name "*contigs-revised-2.fasta" | xargs -P 48 -I {} bash -c 'run_yahs "$@"' _ {}
+find $WORKDIR/chr{1..9} $WORKDIR/chrX -name "*contigs-revised-2.fasta" | xargs -P $THREADS -I {} bash -c 'run_yahs "$@"' _ {}
 
 # Wait for all background processes to finish
 wait
