@@ -2,7 +2,7 @@
 
 Hello,
 
-Here, you may find the code used to make diploid Cannabis assemblies from ultra-long ONT R9 libraries, as described in our preprint: (citation).
+Here, you may find the code used to make diploid assemblies from ultra-long ONT R9 libraries, with Hi-C phasing and scaffolding, as described in our preprint, where we assembled 8 Cannabis haplotypes: (citation).
 
 In re: HMW DNA, our samples were prepared from isolated nuclei, and then size-selected above 50kb on the Blue Pippin. You should also use the Blue Pippin. If you don't have access to one, there are selective precipitation kits that eliminate some short fragments. But the Blue Pippin is much more effective. 
 
@@ -14,7 +14,7 @@ However: Greenhill does not always orient contigs correctly, and also necessaril
 
 The most labor-intensive part of this process is the manually purging and reassingment of contigs, in cases where both haplotigs map to one GreenHill scaffold, or in cases where the coverage of the reference is more than 2. This process probably can and should be automated, based on some simple heuristics, but we have not yet done so. 
 
-Next, the phased contigs are scaffolded, typically to the scale of chromosome arms, with YaHS, which appears to do a much better job of orienting contigs, and discarding duplicates, than HapHiC, 3D-DNA, or any of the other programs we tried. There is a second round of manual purging to discard scrap haplo-scaffolds.
+Next, the phased contigs are scaffolded, frequently to the scale of chromosome arms, with YaHS, which appears to do a much better job of orienting contigs, and discarding duplicates, than HapHiC, 3D-DNA, or any of the other programs we tried. There is a second round of manual purging to discard scrap haplo-scaffolds.
 
 Lastly, the YaHS scaffolds are aligned to the reference, which permits discarding scrap haplotigs, and then you must manually reverse-complement as necessary and fuse them together to make pseudomolecules.
 
@@ -65,13 +65,13 @@ This scripts are in the folder 2-pseudohap-ref. The concept is that the intermed
 
 The scripts which accomplish this task are in the 3-hic folder. They number 21, and surely could be condensed into fewer, but this arrangement helps to guarantee that each step has completed correctly before proceeding. These scripts have dummy SLURM headers that may be modified or ignored. You will need to revise each of these scripts to provide appropriate paths for your filesystem. They were all written by ChatGPT and, if you should have problems with their operation, I suggest asking ChatGPT first, as it composes and parses code much better than I do. However, if you like, I will endeavour to assist where I can. 
 
-The pipeline requires manual evaluation at several points. After 6-newdir.sh completes, there will be a list of contigs per haplotype, to be found at ${DIR}/output/9-hic/2-sort/{CHR_NAME}/purge-1/${CHR_NAME}-${hap}-contigs-revised-1.txt. This list will be used by 7-minimap-2.sh to produce a dotplot of the contigs for each haplotype arranged to the reference chromosome. Your task, as the human, will be to view the two dotplots per chromosome, side-by-side, and decide which contigs need to be relocated from one haplotype to the other, and which contigs are scrap duplicates. These revisions will ned to be made manually to the file ${CHR_NAME}-${hap}-contigs-revised-2.txt, which provides a list or corrected contigs to 8-yahs.sh for scaffolding. With 10 chromosomes and 2 haplotypes, there will, therefore, be 20 files to be edited prior to advancing. 
+The pipeline requires manual evaluation at several points. After 6-newdir.sh completes, there will be a list of contigs per haplotype, to be found at ${DIR}/output/9-hic/2-sort/{CHR_NAME}/purge-1/${CHR_NAME}-${hap}-contigs-revised-1.txt. This list will be used by 7-minimap-2.sh to produce a dotplot of the contigs for each haplotype arranged to the reference chromosome. Your task, as the human, will be to view the two dotplots per chromosome, side-by-side, and decide which contigs need to be relocated from one haplotype to the other, and which contigs are scrap duplicates. These revisions will ned to be made manually to the file ${CHR_NAME}-${hap}-contigs-revised-2.txt, which provides a list of corrected contigs to 8-yahs.sh for scaffolding. With 10 chromosomes and 2 haplotypes, there will, therefore, be 20 files to be edited prior to advancing. 
 
 This process is repeated after 14-per-chr-dotplot.sh, only in this case the edits are made directly to the ${CHR_NAME}-${hap}-contigs-revised-2.txt files. 
 
 The remainder should be fairly self-explanatory. It is an iterative process that requires a lot of squinting at dotplots. However, if you have ultra-long libraries to start with, it is more-or-less straightforward to see which are the good contigs and which are the noise scraps. 
 
-The result from this pipeline will be a small number of scaffolds per chromosome, sometimes as few as two, but sometimes as many as six or eight. To condense them into pseudomolecules, we receommend arranging and concatenating them manually in Geneious Prime.
+The result from this pipeline will be a small number of scaffolds per chromosome, sometimes as few as two, but sometimes as many as six or eight. To condense them into pseudomolecules, we arranged and concatenated them manually in Geneious Prime.
 
 
 
