@@ -1,0 +1,210 @@
+---
+title: "PCA Test - SNP Data"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+# From https://towardsdatascience.com/10-tips-for-choosing-the-optimal-number-of-clusters-277e93d72d92
+
+# Data from PLINK2 PCA - SNP Analysis
+
+# First, let's load the required packages.
+
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(cluster)
+library(cluster.datasets)
+library(cowplot)
+library(NbClust)
+library(clValid)
+library(ggfortify)
+library(clustree)
+library(dendextend)
+library(factoextra)
+library(FactoMineR)
+library(corrplot)
+library(GGally)
+library(ggiraphExtra)
+library(knitr)
+library(kableExtra)
+```
+
+# Set WD
+```{r}
+knitr::opts_chunk$set(root.dir = "/Volumes/data/lh/popgen/pca")
+```
+# Load the PCA results from PLINK2
+
+
+```{r}
+eigenvec_data <- read.table("joint-all-plink-test-lbl-new-names.eigenvec", header = FALSE)
+```
+
+# Assign appropriate column names (FID, IID, PC1, PC2, etc.)
+```{r}
+colnames(eigenvec_data) <- c("FID", "IID", paste0("PC", 1:(ncol(eigenvec_data) - 2)))
+```
+
+Glimpse the data
+
+```{r}
+glimpse(eigenvec_data)
+```
+
+
+
+
+# Visualize the first two principal components
+
+```{r}
+ggplot(eigenvec_data, aes(x = PC1, y = PC2)) +
+    geom_point() +
+    labs(title = "PCA of SNP data", x = "PC1", y = "PC2") +
+    theme_minimal()
+```
+
+
+# Set the number of clusters
+
+```{r}
+
+k <- 4 
+
+# Perform k-means clustering on the PCA scores (using PC1 and PC2 as example)
+set.seed(123)
+kmeans_result <- kmeans(eigenvec_data[, 3:ncol(eigenvec_data)], centers = k, nstart = 30)
+
+# Visualize the clustering result
+ggplot(eigenvec_data, aes(x = PC1, y = PC2, color = factor(kmeans_result$cluster))) +
+    geom_point() +
+    labs(title = paste("k-means Clustering (k =", k, ")"), x = "PC1", y = "PC2", color = "Cluster") +
+    theme_minimal()
+
+```
+
+
+
+
+```{r}
+# Create the plot with smaller text and larger plot size, using labels in place of dots
+p <- ggplot(eigenvec_data, aes(x = PC1, y = PC2, color = factor(kmeans_result$cluster))) +
+  geom_text(aes(label = FID), vjust = 1, hjust = 1, size = 3) +  # Use labels instead of points
+  labs(title = paste("k-means Clustering (k =", k, ")"), x = "PC1: 9.1%", y = "PC2: 7.6%", color = "Group") +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 8),  # Make title and axis labels smaller
+    plot.title = element_text(size = 10)  # Adjust title size specifically
+  )
+
+# Print the plot
+print(p)
+```
+```{r}
+# Plot with color tied to cluster number, no change to color mapping
+p <- ggplot(eigenvec_data, aes(x = PC1, y = PC2, color = factor(kmeans_result$cluster))) +
+  geom_text(aes(label = FID), vjust = 1, hjust = 1, size = 3) +
+  labs(title = paste("k-means Clustering (k =", k, ")"),
+       x = "PC1: 9.1%",
+       y = "PC2: 7.6%",
+       color = "Group") +
+  scale_color_discrete(breaks = c("2", "3", "1", "4"),
+                        labels = c("MJ", "HEMP", "HC_HEMP 1", "HC_HEMP 2")) +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 8),         # keeps overall small size
+    plot.title = element_text(size = 10),  # slightly larger title
+    legend.text = element_text(size = 12)  # specifically larger legend text
+  )
+
+print(p)
+
+```
+```{r}
+# Save the plot as a PNG file
+ggsave("k4-lbl-new-names.png", plot = p, width = 12, height = 12, units = "in", dpi = 300, bg = "white")
+
+```
+
+
+
+
+# Evaluating stability of clusters using Clustree for different k values (1 to 7)
+
+```{r}
+tmp <- list()  # Initialize an empty list to store the kmeans results
+for (k in 1:7) {
+  tmp[[k]] <- kmeans(eigenvec_data[, 3:ncol(eigenvec_data)], centers = k, nstart = 30)$cluster
+}
+df <- data.frame(tmp)  # Convert the list into a data frame
+```
+
+
+# Add a prefix to the column names
+
+```{r}
+colnames(df) <- seq(1:7)
+colnames(df) <- paste0("k", colnames(df))
+```
+
+# Get individual PCA
+
+```{r}
+df.pca <- prcomp(df, center = TRUE, scale. = FALSE)
+ind.coord <- df.pca$x
+ind.coord <- ind.coord[, 1:2]
+df <- bind_cols(as.data.frame(df), as.data.frame(ind.coord))
+```
+
+# Visualize with Clustree
+
+```{r}
+clustree(df, prefix = "k")
+
+```
+
+
+# Hierarchical clustering using Euclidean distance
+
+```{r}
+dist_matrix <- dist(eigenvec_data[, 3:ncol(eigenvec_data)], method = "euclidean")
+hc <- hclust(dist_matrix, method = "ward.D2")
+```
+
+```{r}
+labels <- eigenvec_data$IID  # Replace with the appropriate column name if needed
+
+```
+
+# Plot the dendrogram
+
+```{r}
+plot(hc, labels = labels)
+rect.hclust(hc, k = 4, border = 2:5)  # Cut tree into 4 groups
+```
+# make it bigger
+
+```{r}
+# Perform hierarchical clustering
+dist_matrix <- dist(eigenvec_data[, 3:ncol(eigenvec_data)])  # Adjust based on your data
+hc <- hclust(dist_matrix, method = "ward.D2")
+
+# Open a new plotting window with a larger size (make it 3x bigger)
+dev.new(width = 15, height = 15)  # Adjust width and height to increase plot size
+
+# Adjust plot margins (if necessary) to accommodate larger plot
+par(mar = c(8, 8, 4, 2))  # Increase margins
+
+# Plot the dendrogram with custom labels, and make the text smaller (cex < 1)
+plot(hc, labels = labels, cex = 0.5)  # 'cex = 0.5' makes the text smaller
+
+# Cut the tree into 4 groups
+rect.hclust(hc, k = 2, border = 2:5)
+
+
+```
+

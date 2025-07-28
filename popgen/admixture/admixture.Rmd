@@ -1,0 +1,177 @@
+---
+title: "admixture"
+output: html_document
+date: "2024-11-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(root.dir = "/Volumes/data/lh/popgen/admixture")
+```
+
+
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(reshape2)
+
+# Read the Q matrix (ancestry proportions)
+q_matrix <- read.table("joint-all-recode-structure.4.Q", header = FALSE)
+
+# Read sample names from the file
+sample_names <- readLines("sample_identifiers_new.txt")  # Ensure this file contains one sample name per line
+
+# Reshape the Q matrix to long format (each row will be a sample-population combination)
+q_matrix_long <- melt(q_matrix, variable.name = "Population", value.name = "Proportion")
+
+# Ensure the number of sample names matches the number of samples in the Q matrix
+if (length(sample_names) != nrow(q_matrix)) {
+  stop("The number of sample names does not match the number of samples in the Q matrix.")
+}
+
+# Assign the sample names
+q_matrix_long$Sample <- rep(sample_names, times = ncol(q_matrix))  # Repeat for each population
+
+# Create the stacked bar chart
+plot <- ggplot(q_matrix_long, aes(x = factor(Sample), y = Proportion, fill = factor(Population))) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 6)) +  # Reduce font size for readability
+  labs(title = "Ancestry Proportions", x = "Sample", y = "Proportion") +
+  scale_fill_discrete(name = "Population") +
+  theme_minimal()
+
+# Set the plot size for the print output (making it wider)
+options(repr.plot.width = 30, repr.plot.height = 6)
+
+# Print the plot
+print(plot)
+```
+
+
+#sort
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+
+# Read the Q matrix (ancestry proportions)
+q_matrix <- read.table("joint-all-recode-structure.4.Q", header = FALSE)
+
+# Read sample names from the correct file
+sample_names <- readLines("sample_identifiers_new.txt")  # Corrected file name
+
+# Reshape the Q matrix to long format (each row will be a sample-population combination)
+q_matrix_long <- melt(q_matrix, variable.name = "Population", value.name = "Proportion")
+
+# Ensure the number of sample names matches the number of samples in the Q matrix
+if (length(sample_names) != nrow(q_matrix)) {
+  stop("The number of sample names does not match the number of samples in the Q matrix.")
+}
+
+# Assign the sample names
+q_matrix_long$Sample <- rep(sample_names, times = ncol(q_matrix))  # Repeat for each population
+
+# Calculate the percentage of V1, V2, and V3 ancestry for each sample
+v1_proportion <- q_matrix_long %>%
+  filter(Population == "V1") %>%
+  group_by(Sample) %>%
+  summarise(V1_Percentage = sum(Proportion))
+
+v2_proportion <- q_matrix_long %>%
+  filter(Population == "V2") %>%
+  group_by(Sample) %>%
+  summarise(V2_Percentage = sum(Proportion))
+
+v3_proportion <- q_matrix_long %>%
+  filter(Population == "V3") %>%
+  group_by(Sample) %>%
+  summarise(V3_Percentage = sum(Proportion))
+
+# Merge the V1, V2, and V3 percentages with the main data frame
+q_matrix_long <- merge(q_matrix_long, v1_proportion, by = "Sample")
+q_matrix_long <- merge(q_matrix_long, v2_proportion, by = "Sample")
+q_matrix_long <- merge(q_matrix_long, v3_proportion, by = "Sample")
+
+# Create a sorting order based on V1 first and V3 second for 0% V1, then by V2 for 0% V1 and 0% V3
+sorted_samples <- q_matrix_long %>%
+  distinct(Sample, V1_Percentage, V2_Percentage, V3_Percentage) %>%
+  arrange(desc(V1_Percentage), V3_Percentage, desc(V2_Percentage))  # Sort by V1 descending, then V3, then V2 for 0% V1 and V3
+
+# Reorder the Sample factor according to the sorted order
+q_matrix_long$Sample <- factor(q_matrix_long$Sample, levels = sorted_samples$Sample)
+
+# Create the stacked bar chart
+plot <- ggplot(q_matrix_long, aes(x = factor(Sample), y = Proportion, fill = factor(Population))) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 6)) +  # Rotate the labels to 45 degrees
+  labs(title = "Ancestry Proportions", x = "Sample", y = "Proportion") +
+  scale_fill_discrete(name = "Population") +
+  theme_minimal()
+
+# Set the plot size for the print output (making it wider)
+options(repr.plot.width = 30, repr.plot.height = 6)
+
+# Print the plot
+print(plot)
+
+```
+```{r}
+# Create the horizontal bar chart without the labels
+plot <- ggplot(q_matrix_long, aes(y = factor(Sample), x = Proportion, fill = factor(Population))) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.y = element_text(angle = 0, hjust = 1, size = 6)) +  # Rotate the labels to be horizontal
+  scale_fill_discrete(name = "Population") +  # Keep the population legend
+  theme_minimal() +
+  theme(
+    # Remove axis labels and title
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    plot.title = element_blank(),
+    # Optionally remove axis ticks
+    axis.ticks = element_blank(),
+    # Remove grid lines
+    panel.grid = element_blank()
+  )
+
+# Print the plot
+print(plot)
+```
+
+
+```{r}
+# Save the plot as a PNG file
+ggsave("admixture-turned-new.png", plot = plot, width = 6.27, height = 9.7, units = "in", dpi = 300)
+```
+
+```{r}
+plot <- ggplot(q_matrix_long, aes(y = factor(Sample), x = Proportion, fill = factor(Population))) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.y = element_text(angle = 0, hjust = 1, size = 6)) +  # Rotate the labels to be horizontal
+  scale_fill_discrete(name = "Population", labels = c("'indica' MJ", "'sativa' MJ", "HEMP", "HC_HEMP")) +  # Set custom labels
+  theme_minimal() +
+  theme(
+    # Remove axis labels and title
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    plot.title = element_blank(),
+    # Optionally remove axis ticks
+    axis.ticks = element_blank(),
+    # Remove grid lines
+    panel.grid = element_blank(),
+    # Set background to white
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white")
+  )
+
+# Print the plot
+print(plot)
+
+```
+```{r}
+# Save the plot as a PNG file
+ggsave("admixture-turned-new.png", plot = plot, width = 6.27, height = 9.7, units = "in", dpi = 300)
+```
+
+
