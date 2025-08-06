@@ -6,7 +6,7 @@ Here, you may find the code used to make diploid assemblies from ultra-long ONT 
 
 In re: HMW DNA, our samples were prepared from isolated nuclei, and then size-selected above 50kb on the Blue Pippin. If you don't have access to one, there are selective precipitation kits that eliminate some short fragments. But the Blue Pippin is much more effective. 
 
-The contigs are created with PECAT, which does haplotype-aware error correction, apparently not as well as HERRO, but without needing GPU. If you have GPU, you should probably try HERRO. We include a sample config file which has comments on the optimized parameters. You will need to remove the #comment lines from the .cfg prior to using it. 
+The contigs are created with PECAT, which does haplotype-aware error correction, probably not as well as HERRO, but without needing GPU. If you have GPU, you should probably try HERRO. We include a sample config file which has comments on the optimized parameters. You will need to remove the #comment lines from the .cfg prior to using it. 
 
 Once you have diploid contigs, the tricky bit is phasing them with Hi-C libraries. Here, we begin by binning psuedohaploid contigs among chromosomes using a reference, and then assembling them to pseudomolecules with HapHiC. Next, dual contigs are binned among the pseudohaps to create 10 piles of contigs. Each pile is then phased, frequently to chromosome scale, with GreenHill. Greenhill advances the theory of Falcon-Phase, and also incorporates the long reads. It is also able to incorporate a typical paired-end library, but we have not done so. The paper is worth reading: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-03006-8
 
@@ -18,7 +18,7 @@ Next, the phased contigs are scaffolded, frequently to the scale of chromosome a
 
 Lastly, the YaHS scaffolds are aligned to the reference, which permits discarding scrap haplotigs, and then you must manually reverse-complement as necessary and fuse them together to make pseudomolecules.
 
-This pipeline is not straightforward to use and I apologize for that. If you have R10 reads and a Hi-C library you're probably better off using Hifiasm or Verkko. But, if you want to make dual assemblies from old R9 reads, this will get the job done. 
+This pipeline is not straightforward to use and I apologize for that. If you have R10 reads you're probably better off using Hifiasm or Verkko. But, if you want to make dual assemblies from old R9 reads, this will get the job done. 
 
 # Software required
 
@@ -59,7 +59,7 @@ Lastly, with 6-ntedit.sh you may polish 4 times with ntEdit, using kmers derived
 
 ## Making pseudohaploid reference chromosomes
 
-This scripts are in the folder 2-pseudohap-ref. The concept is that the intermediate, pre-phased contigs (in PECAT's 3-assemble folder) are arranged into linkage groups after binning against a reference, in this case Sour Diesel B, from the Salk Institute Cannabis Pangenome project. Each chromosome's are arranged into pseudomolecules with HapHiC, which runs 10 times, once for each chromosome, to avoid megascaffolds. This structure, which contains both the primary and alternate contigs of the initial draft, is then used to bin the dual contigs, which are shorter.
+This scripts are in the folder 2-pseudohap-ref. The concept is that the intermediate, unphased contigs (in PECAT's 3-assemble folder) are arranged into linkage groups after binning against a reference, in this case Sour Diesel B, from the Salk Institute Cannabis Pangenome project. Each chromosome's contigs are arranged into pseudomolecules with HapHiC, which runs 10 times, once for each chromosome, to avoid megascaffolds. This structure, which contains both the primary and alternate contigs of the initial draft, is then used to bin the dual contigs, which are shorter.
 
 ## Phasing dual contigs with GreenHill
 
