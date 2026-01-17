@@ -1,25 +1,26 @@
 #!/bin/bash
 
-#SBATCH --job-name=joint-pca-ene2025
+#SBATCH --job-name=pca-plink
 #SBATCH --output=%x.txt
-#SBATCH --partition=debug
+#SBATCH --partition=
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=48
 
 # Prepare the environment
 
-source /apps/bpike/miniforge3/etc/profile.d/conda.sh
+source /path/to/miniforge3/etc/profile.d/conda.sh
 conda activate popgen
 set -euo pipefail
 
 # Set shell variables
 
-DIR="/data_HPC02/bpike/lh/pan/align/popgen-85/ene2025/maf010"
-BASE="joint-85-ene2025"
-VCF="/data_HPC02/bpike/lh/pan/align/popgen-85/ene2025/joint-85-ene2025-snps-maf-05.recode.vcf.gz"
+DIR={directory}
+BASE={name for output files}
+VCF={input vcf.gz}
 W=50
 OUT="${BASE}-plink-${W}"
+PC={number of samples minus one}
 
 mkdir -p $DIR
 cd "$DIR"
@@ -49,5 +50,5 @@ plink --bfile $OUT \
 --allow-extra-chr \
 --set-missing-var-ids @:# \
 --extract $OUT.prune.in \
---pca 84 \
+--pca $PC \
 --out $OUT
