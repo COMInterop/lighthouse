@@ -6,7 +6,7 @@ Here, you may find the code used to make diploid assemblies from ultra-long ONT 
 
 In re: HMW DNA, our samples were prepared from isolated nuclei, and then size-selected above 50kb on the Blue Pippin. If you don't have access to one, there are selective precipitation kits that eliminate some short fragments. But the Blue Pippin is much more effective. 
 
-The contigs are created with PECAT, which does haplotype-aware error correction, probably not as well as HERRO, but without needing GPU. If you have GPU, you should probably try HERRO. We include a sample config file which has comments on the optimized parameters. You will need to remove the #comment lines from the .cfg prior to using it. 
+The contigs are created with PECAT, which does haplotype-aware error correction. We include a sample config file which has comments on the optimized parameters. You will need to remove the #comment lines from the .cfg prior to using it. 
 
 Once you have diploid contigs, the tricky bit is phasing them with Hi-C libraries. Here, we begin by binning psuedohaploid contigs among chromosomes using a reference, and then assembling them to pseudomolecules with HapHiC. Next, dual contigs are binned among the pseudohaps to create 10 piles of contigs. Each pile is then phased, frequently to chromosome scale, with GreenHill. Greenhill advances the theory of Falcon-Phase, and also incorporates the long reads. It is also able to incorporate a typical paired-end library, but we have not done so. The paper is worth reading: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-03006-8
 
