@@ -16,7 +16,7 @@ output:
 
 ```{r}
 library(tidyverse)
-library(magrittr)
+
 library(cluster)
 library(cluster.datasets)
 library(cowplot)
@@ -29,39 +29,127 @@ library(factoextra)
 library(FactoMineR)
 library(corrplot)
 library(GGally)
-library(ggiraphExtra)
 library(knitr)
 library(kableExtra)
+library(ggiraphExtra)
+library(magrittr)
+library(cols4all)
 ```
 
-# Set WD
-```{r}
-knitr::opts_chunk$set(root.dir = "/Volumes/data/lh/popgen/pca")
+
+## Define Colorblind-Friendly Palette
+```{r define-colors}
+# Using the 'friendly7' palette from cols4all
+# Get the friendly7 palette colors
+friendly7_palette <- c4a("friendly7", 7)
+
+# Display the palette to verify colors
+print("Friendly7 palette colors:")
+print(friendly7_palette)
+
+# Assign colors to populations based on desired characteristics:
+# Group 1: HC_HEMP_2 - red-orange-brown variant
+# Group 2: MJ - yellow-orange-tan for indica MJ / green for sativa MJ
+# Group 3: HEMP - light blue
+# Group 4: HC_HEMP_1 - red-orange-brown
+
+cb_colors <- list(
+  hc_hemp_2 = friendly7_palette[5],      # red-orange-brown variant for HC_HEMP_2 (Group 1)
+  mj = friendly7_palette[3],             # green for MJ (Group 2)
+  hemp = friendly7_palette[4],           # light blue for HEMP (Group 3)
+  hc_hemp_1 = friendly7_palette[1]       # red-orange-brown for HC_HEMP_1 (Group 4)
+)
+
+# Display assigned colors
+print("Assigned colors:")
+print(cb_colors)
+
+# Create a named vector for k=4 clustering
+# Mapping cluster numbers to group labels
+k4_colors <- c(
+  "1" = cb_colors$hc_hemp_2,   # Group 1 = HC_HEMP_2
+  "2" = cb_colors$mj,          # Group 2 = MJ
+  "3" = cb_colors$hemp,        # Group 3 = HEMP
+  "4" = cb_colors$hc_hemp_1    # Group 4 = HC_HEMP_1
+)
+
+k4_labels <- c(
+  "1" = "HC_HEMP_2",
+  "2" = "MJ",
+  "3" = "HEMP",
+  "4" = "HC_HEMP_1"
+)
 ```
+
+```{r define-colors}
+# Using the 'friendly7' palette from cols4all
+# Get the friendly7 palette colors
+friendly7_palette <- c4a("friendly7", 7)
+
+# Display the palette to verify colors
+print("Friendly7 palette colors:")
+print(friendly7_palette)
+
+# Assign colors to populations based on desired characteristics:
+# Group 1: HC_HEMP_2 - red-orange-brown variant
+# Group 2: MJ - yellow-orange-tan for indica MJ / green for sativa MJ
+# Group 3: HEMP - light blue (darkened)
+# Group 4: HC_HEMP_1 - red-orange-brown
+
+# Function to darken a color
+darken_color <- function(color, factor = 0.9) {
+  rgb_vals <- col2rgb(color) / 255
+  darkened <- rgb_vals * factor
+  rgb(darkened[1], darkened[2], darkened[3])
+}
+
+cb_colors <- list(
+  hc_hemp_2 = friendly7_palette[5],      # red-orange-brown variant for HC_HEMP_2 (Group 1)
+  mj = friendly7_palette[3],             # green for MJ (Group 2)
+  hemp = darken_color(friendly7_palette[4]),  # darkened light blue for HEMP (Group 3)
+  hc_hemp_1 = friendly7_palette[1]       # red-orange-brown for HC_HEMP_1 (Group 4)
+)
+
+# Display assigned colors
+print("Assigned colors:")
+print(cb_colors)
+
+# Create a named vector for k=4 clustering
+# Mapping cluster numbers to group labels
+k4_colors <- c(
+  "1" = cb_colors$hc_hemp_2,   # Group 1 = HC_HEMP_2
+  "2" = cb_colors$mj,          # Group 2 = MJ
+  "3" = cb_colors$hemp,        # Group 3 = HEMP
+  "4" = cb_colors$hc_hemp_1    # Group 4 = HC_HEMP_1
+)
+
+k4_labels <- c(
+  "1" = "HC_HEMP_2",
+  "2" = "MJ",
+  "3" = "HEMP",
+  "4" = "HC_HEMP_1"
+)
+```
+
+# I've added a `darken_color()` function that multiplies the RGB values by a factor (0.75 in this case, which makes it 25% darker). You can adjust the factor if you want it darker (use a smaller number like 0.7) or less dark (use a larger number like 0.8).
+
+# Prepare the environment 
+```{r}
+#Set WD
+knitr::opts_chunk$set(root.dir = "/Volumes/18tb/lh/align/popgen-85/all/pca")
+setwd("/Volumes/18tb/lh/align/popgen-85/all/pca")
 # Load the PCA results from PLINK2
-
-
-```{r}
-eigenvec_data <- read.table("joint-all-plink-test-lbl-new-names.eigenvec", header = FALSE)
-```
-
+eigenvec_data <- read.table("joint-all-plink-test-lbl.eigenvec", header = FALSE)
 # Assign appropriate column names (FID, IID, PC1, PC2, etc.)
-```{r}
 colnames(eigenvec_data) <- c("FID", "IID", paste0("PC", 1:(ncol(eigenvec_data) - 2)))
 ```
 
-Glimpse the data
 
+# Visualize the essentials
 ```{r}
+#Glimpse the data
 glimpse(eigenvec_data)
-```
-
-
-
-
 # Visualize the first two principal components
-
-```{r}
 ggplot(eigenvec_data, aes(x = PC1, y = PC2)) +
     geom_point() +
     labs(title = "PCA of SNP data", x = "PC1", y = "PC2") +
@@ -69,32 +157,39 @@ ggplot(eigenvec_data, aes(x = PC1, y = PC2)) +
 ```
 
 
-# Set the number of clusters
+
+# K-means clustering
 
 ```{r}
+#Set the number of clusters
 
 k <- 4 
 
-# Perform k-means clustering on the PCA scores (using PC1 and PC2 as example)
+# Extract only numeric PC columns for clustering
+pc_cols <- grep("^PC", names(eigenvec_data), value = TRUE)
+pca_data <- eigenvec_data[, pc_cols]
+
+# Perform k-means clustering on the PCA scores
 set.seed(123)
-kmeans_result <- kmeans(eigenvec_data[, 3:ncol(eigenvec_data)], centers = k, nstart = 30)
+kmeans_result <- kmeans(pca_data, centers = k, nstart = 30)
 
-# Visualize the clustering result
-ggplot(eigenvec_data, aes(x = PC1, y = PC2, color = factor(kmeans_result$cluster))) +
-    geom_point() +
-    labs(title = paste("k-means Clustering (k =", k, ")"), x = "PC1", y = "PC2", color = "Cluster") +
-    theme_minimal()
+# Create a labeled cluster column
+eigenvec_data$cluster_label <- factor(kmeans_result$cluster, 
+                                       levels = c("1", "2", "3", "4"),
+                                       labels = c("HC_HEMP_2", "MJ", "HEMP", "HC_HEMP_1"))
 
-```
+# Reorder factor levels for legend display: HEMP, HC_HEMP_1, HC_HEMP_2, MJ
+eigenvec_data$cluster_label <- factor(eigenvec_data$cluster_label,
+                                       levels = c("HEMP", "HC_HEMP_1", "HC_HEMP_2", "MJ"))
 
-
-
-
-```{r}
 # Create the plot with smaller text and larger plot size, using labels in place of dots
-p <- ggplot(eigenvec_data, aes(x = PC1, y = PC2, color = factor(kmeans_result$cluster))) +
+p <- ggplot(eigenvec_data, aes(x = PC1, y = PC2, color = cluster_label)) +
   geom_text(aes(label = FID), vjust = 1, hjust = 1, size = 3) +  # Use labels instead of points
   labs(title = paste("k-means Clustering (k =", k, ")"), x = "PC1: 9.1%", y = "PC2: 7.6%", color = "Group") +
+  scale_color_manual(values = c("HEMP" = cb_colors$hemp,
+                                 "HC_HEMP_1" = cb_colors$hc_hemp_1,
+                                 "HC_HEMP_2" = cb_colors$hc_hemp_2,
+                                 "MJ" = cb_colors$mj)) +
   theme_minimal() +
   theme(
     text = element_text(size = 8),  # Make title and axis labels smaller
@@ -104,107 +199,408 @@ p <- ggplot(eigenvec_data, aes(x = PC1, y = PC2, color = factor(kmeans_result$cl
 # Print the plot
 print(p)
 ```
-```{r}
-# Plot with color tied to cluster number, no change to color mapping
-p <- ggplot(eigenvec_data, aes(x = PC1, y = PC2, color = factor(kmeans_result$cluster))) +
-  geom_text(aes(label = FID), vjust = 1, hjust = 1, size = 3) +
-  labs(title = paste("k-means Clustering (k =", k, ")"),
-       x = "PC1: 9.1%",
-       y = "PC2: 7.6%",
-       color = "Group") +
-  scale_color_discrete(breaks = c("2", "3", "1", "4"),
-                        labels = c("MJ", "HEMP", "HC_HEMP 1", "HC_HEMP 2")) +
-  theme_minimal() +
-  theme(
-    text = element_text(size = 8),         # keeps overall small size
-    plot.title = element_text(size = 10),  # slightly larger title
-    legend.text = element_text(size = 12)  # specifically larger legend text
-  )
 
-print(p)
 
-```
-```{r}
+
 # Save the plot as a PNG file
-ggsave("k4-lbl-new-names.png", plot = p, width = 12, height = 12, units = "in", dpi = 300, bg = "white")
 
+```{r}
+ggsave("k4-lbl.png", 
+         plot = p, width = 21, 
+         height = 21,
+        units = "cm", 
+       dpi = 600)
 ```
 
 
-
-
-# Evaluating stability of clusters using Clustree for different k values (1 to 7)
+# K-means clustering with k = 2, 3, 5
 
 ```{r}
-tmp <- list()  # Initialize an empty list to store the kmeans results
-for (k in 1:7) {
-  tmp[[k]] <- kmeans(eigenvec_data[, 3:ncol(eigenvec_data)], centers = k, nstart = 30)$cluster
+
+library(gridExtra)
+library(grid)
+
+# Extract PCA data (only numeric PC columns, exclude cluster_label if present)
+# Get column names that start with "PC"
+pc_cols <- grep("^PC", names(eigenvec_data), value = TRUE)
+pca_data <- eigenvec_data[, pc_cols]
+
+k_values <- c(2, 3, 5)
+kmeans_plot_list <- list()
+panel_labels <- c("a) k=2", "b) k=3", "c) k=5")
+
+for (i in seq_along(k_values)) {
+  k_val <- k_values[i]
+  
+  # Run k-means with the current k value
+  set.seed(123)
+  kmeans_result <- kmeans(pca_data, centers = k_val, nstart = 30)
+  
+  # Print summary
+  cat("\nk =", k_val, "\n")
+  cat("Total within-cluster sum of squares:", kmeans_result$tot.withinss, "\n")
+  print(table(kmeans_result$cluster))
+  
+  # Store clustering results in a temporary data frame to force evaluation
+  plot_data <- eigenvec_data
+  plot_data$cluster <- factor(kmeans_result$cluster)
+  
+  # Use specific colors and labels based on k value
+  if (k_val == 2) {
+    # k=2: group 1 is MJ/HEMP (green), group 2 is HC_HEMP (red-orange)
+    # Legend order: HC_HEMP, MJ/HEMP
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("2", "1"))
+    current_colors <- setNames(c(cb_colors$hc_hemp_1, cb_colors$mj),
+                                c("2", "1"))
+    current_labels <- setNames(c("HC_HEMP", "MJ/HEMP"), c("2", "1"))
+  } else if (k_val == 3) {
+    # k=3: group 1 is HC_HEMP, group 2 is HEMP, group 3 is MJ
+    # Legend order: HEMP, HC_HEMP, MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("2", "1", "3"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$mj),
+                                c("2", "1", "3"))
+    current_labels <- setNames(c("HEMP", "HC_HEMP", "MJ"), c("2", "1", "3"))
+  } else if (k_val == 5) {
+    # k=5: group 1 is 'indica' MJ, group 2 is HC_HEMP_2, group 3 is 'sativa' MJ, group 4 is HC_HEMP_1, group 5 is HEMP
+    # Legend order: HEMP, HC_HEMP_1, HC_HEMP_2, 'sativa' MJ, 'indica' MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("5", "4", "2", "3", "1"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$hc_hemp_2, friendly7_palette[2], friendly7_palette[3]),
+                                c("5", "4", "2", "3", "1"))
+    current_labels <- setNames(c("HEMP", "HC_HEMP_1", "HC_HEMP_2", "'sativa' MJ", "'indica' MJ"), c("5", "4", "2", "3", "1"))
+  } else {
+    current_colors <- setNames(friendly7_palette[1:k_val], levels(plot_data$cluster))
+    current_labels <- NULL
+  }
+  
+  p <- ggplot(plot_data, aes(x = PC1, y = PC2, color = cluster)) +
+    geom_text(aes(label = FID), vjust = 1, hjust = 1, size = 2.5) +
+    labs(title = panel_labels[i],
+         x = "PC1: 9.1%", 
+         y = "PC2: 7.6%", 
+         color = "Group") +
+    scale_color_manual(values = current_colors, labels = current_labels) +
+    theme_minimal() +
+    theme(
+      text = element_text(size = 10),
+      plot.title = element_text(size = 11, face = "bold"),
+      legend.position = "right"
+    )
+  
+  # Force evaluation by printing
+  print(p)
+  
+  # Store the plot
+  kmeans_plot_list[[i]] <- p
 }
-df <- data.frame(tmp)  # Convert the list into a data frame
+
+# Arrange all 4 plots in a 2x2 grid and save as A4 PNG
+kmeans_combined <- grid.arrange(grobs = kmeans_plot_list, ncol = 2)
+
+# Save as A4-sized PNG (21 x 29.7 cm)
+ggsave("kmeans-clustering-k2-k5.png", 
+       plot = kmeans_combined, 
+       width = 21, 
+       height = 29.7, 
+       units = "cm", 
+       dpi = 600, 
+       bg = "white")
+
+cat("\nK-means clustering plot saved as 'kmeans-clustering-k2-k5.png'\n")
 ```
 
+# Partitioning around medioids (PAM), k=2 to 5
 
-# Add a prefix to the column names
 
 ```{r}
-colnames(df) <- seq(1:7)
-colnames(df) <- paste0("k", colnames(df))
+# PAM clustering with k from 2 to 5
+library(cluster)
+library(gridExtra)
+library(grid)
+
+# Extract PCA data (only numeric PC columns, exclude cluster_label if present)
+# Get column names that start with "PC"
+pc_cols <- grep("^PC", names(eigenvec_data), value = TRUE)
+pca_data <- eigenvec_data[, pc_cols]
+
+k_values <- 2:5
+pam_plot_list <- list()
+panel_labels <- c("a) k=2", "b) k=3", "c) k=4", "d) k=5")
+
+for (i in seq_along(k_values)) {
+  k_val <- k_values[i]
+  
+  # Run PAM with the current k value
+  pam_result <- pam(pca_data, k = k_val)
+  
+  # Print silhouette score
+  cat("\nk =", k_val, "- Average Silhouette Width:", pam_result$silinfo$avg.width, "\n")
+  cat("Number of clusters:", length(unique(pam_result$clustering)), "\n")
+  print(table(pam_result$clustering))
+  
+  # Store clustering results in a temporary data frame to force evaluation
+  plot_data <- eigenvec_data
+  plot_data$cluster <- factor(pam_result$clustering)
+  
+  # Use specific colors and labels based on k value
+  if (k_val == 2) {
+    # k=2: group 1 is MJ, group 2 is HEMP
+    current_colors <- setNames(c(cb_colors$mj, cb_colors$hemp),
+                                c("1", "2"))
+    current_labels <- setNames(c("MJ", "HEMP"), c("1", "2"))
+  } else if (k_val == 3) {
+    # k=3: group 1 is MJ, group 2 is HEMP, group 3 is HC_HEMP
+    current_colors <- setNames(c(cb_colors$mj, cb_colors$hemp, cb_colors$hc_hemp_1),
+                                c("1", "2", "3"))
+    current_labels <- setNames(c("MJ", "HEMP", "HC_HEMP"), c("1", "2", "3"))
+  } else if (k_val == 4) {
+    # k=4: group 1 is MJ, group 2 is HEMP, group 3 is HC_HEMP_1, group 4 is HC_HEMP_2
+    current_colors <- setNames(c(cb_colors$mj, cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$hc_hemp_2),
+                                c("1", "2", "3", "4"))
+    current_labels <- setNames(c("MJ", "HEMP", "HC_HEMP_1", "HC_HEMP_2"), c("1", "2", "3", "4"))
+  } else if (k_val == 5) {
+    # k=5: group 1 is MJ, group 2 is HEMP, group 3 is HC_HEMP_1, group 4 is HC_HEMP_2, group 5 is HC_HEMP_3
+    current_colors <- setNames(c(cb_colors$mj, cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$hc_hemp_2, friendly7_palette[6]),
+                                c("1", "2", "3", "4", "5"))
+    current_labels <- setNames(c("MJ", "HEMP", "HC_HEMP_1", "HC_HEMP_2", "HC_HEMP_3"), c("1", "2", "3", "4", "5"))
+  } else {
+    current_colors <- setNames(friendly7_palette[1:k_val], levels(plot_data$cluster))
+    current_labels <- NULL
+  }
+  
+  p <- ggplot(plot_data, aes(x = PC1, y = PC2, color = cluster)) +
+    geom_text(aes(label = FID), vjust = 1, hjust = 1, size = 2.5) +
+    labs(title = panel_labels[i], 
+         x = "PC1: 9.1%", 
+         y = "PC2: 7.6%", 
+         color = "Group") +
+    scale_color_manual(values = current_colors, labels = current_labels) +
+    theme_minimal() +
+    theme(
+      text = element_text(size = 10),
+      plot.title = element_text(size = 11, face = "bold"),
+      legend.position = "right"
+    )
+  
+  # Force evaluation by printing (this ensures the plot is created now)
+  print(p)
+  
+  # Store the plot
+  pam_plot_list[[i]] <- p
+}
+
+# Arrange all 4 plots in a 2x2 grid and save as A4 PNG
+pam_combined <- grid.arrange(grobs = pam_plot_list, ncol = 2)
+
+# Save as A4-sized PNG (21 x 29.7 cm)
+ggsave("pam-clustering-k2-k5.png", 
+       plot = pam_combined, 
+       width = 21, 
+       height = 29.7, 
+       units = "cm", 
+       dpi = 600, 
+       bg = "white")
+
+cat("\nPAM clustering plot saved as 'pam-clustering-k2-k5.png'\n")
+```
+```{r}
+# PAM clustering with k from 2 to 5
+library(cluster)
+library(gridExtra)
+library(grid)
+
+# Extract PCA data (only numeric PC columns, exclude cluster_label if present)
+# Get column names that start with "PC"
+pc_cols <- grep("^PC", names(eigenvec_data), value = TRUE)
+pca_data <- eigenvec_data[, pc_cols]
+
+k_values <- 2:5
+pam_plot_list <- list()
+panel_labels <- c("a) k=2", "b) k=3", "c) k=4", "d) k=5")
+
+for (i in seq_along(k_values)) {
+  k_val <- k_values[i]
+  
+  # Run PAM with the current k value
+  pam_result <- pam(pca_data, k = k_val)
+  
+  # Print silhouette score
+  cat("\nk =", k_val, "- Average Silhouette Width:", pam_result$silinfo$avg.width, "\n")
+  cat("Number of clusters:", length(unique(pam_result$clustering)), "\n")
+  print(table(pam_result$clustering))
+  
+  # Store clustering results in a temporary data frame to force evaluation
+  plot_data <- eigenvec_data
+  plot_data$cluster <- factor(pam_result$clustering)
+  
+  # Use specific colors and labels based on k value
+  if (k_val == 2) {
+    # k=2: group 1 is MJ, group 2 is HEMP
+    # Legend order: HEMP, MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("2", "1"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$mj),
+                                c("2", "1"))
+    current_labels <- setNames(c("HEMP", "MJ"), c("2", "1"))
+  } else if (k_val == 3) {
+    # k=3: group 1 is MJ, group 2 is HEMP, group 3 is HC_HEMP
+    # Legend order: HEMP, HC_HEMP, MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("2", "3", "1"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$mj),
+                                c("2", "3", "1"))
+    current_labels <- setNames(c("HEMP", "HC_HEMP", "MJ"), c("2", "3", "1"))
+  } else if (k_val == 4) {
+    # k=4: group 1 is MJ, group 2 is HEMP, group 3 is HC_HEMP_1, group 4 is HC_HEMP_2
+    # Legend order: HEMP, HC_HEMP_1, HC_HEMP_2, MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("2", "3", "4", "1"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$hc_hemp_2, cb_colors$mj),
+                                c("2", "3", "4", "1"))
+    current_labels <- setNames(c("HEMP", "HC_HEMP_1", "HC_HEMP_2", "MJ"), c("2", "3", "4", "1"))
+  } else if (k_val == 5) {
+    # k=5: group 1 is MJ, group 2 is HEMP, group 3 is HC_HEMP_1, group 4 is HC_HEMP_2, group 5 is HC_HEMP_3
+    # Legend order: HEMP, HC_HEMP_1, HC_HEMP_2, HC_HEMP_3, MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("2", "3", "4", "5", "1"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$hc_hemp_2, friendly7_palette[6], cb_colors$mj),
+                                c("2", "3", "4", "5", "1"))
+    current_labels <- setNames(c("HEMP", "HC_HEMP_1", "HC_HEMP_2", "HC_HEMP_3", "MJ"), c("2", "3", "4", "5", "1"))
+  } else {
+    current_colors <- setNames(friendly7_palette[1:k_val], levels(plot_data$cluster))
+    current_labels <- NULL
+  }
+  
+  p <- ggplot(plot_data, aes(x = PC1, y = PC2, color = cluster)) +
+    geom_text(aes(label = FID), vjust = 1, hjust = 1, size = 2.5) +
+    labs(title = panel_labels[i], 
+         x = "PC1: 9.1%", 
+         y = "PC2: 7.6%", 
+         color = "Group") +
+    scale_color_manual(values = current_colors, labels = current_labels) +
+    theme_minimal() +
+    theme(
+      text = element_text(size = 10),
+      plot.title = element_text(size = 11, face = "bold"),
+      legend.position = "right"
+    )
+  
+  # Force evaluation by printing (this ensures the plot is created now)
+  print(p)
+  
+  # Store the plot
+  pam_plot_list[[i]] <- p
+}
+
+# Arrange all 4 plots in a 2x2 grid and save as A4 PNG
+pam_combined <- grid.arrange(grobs = pam_plot_list, ncol = 2)
+
+# Save as A4-sized PNG (21 x 29.7 cm)
+ggsave("pam-clustering-k2-k5.png", 
+       plot = pam_combined, 
+       width = 21, 
+       height = 29.7, 
+       units = "cm", 
+       dpi = 600, 
+       bg = "white")
+
+cat("\nPAM clustering plot saved as 'pam-clustering-k2-k5.png'\n")
 ```
 
-# Get individual PCA
+# Gaussian Mixture Model (GMM), k-sweep from 2 to 5
 
 ```{r}
-df.pca <- prcomp(df, center = TRUE, scale. = FALSE)
-ind.coord <- df.pca$x
-ind.coord <- ind.coord[, 1:2]
-df <- bind_cols(as.data.frame(df), as.data.frame(ind.coord))
+# GMM clustering with k from 2 to 5
+library(mclust)
+library(gridExtra)
+library(grid)
+
+# Extract PCA data (only numeric PC columns, exclude cluster_label if present)
+# Get column names that start with "PC"
+pc_cols <- grep("^PC", names(eigenvec_data), value = TRUE)
+pca_data <- eigenvec_data[, pc_cols]
+
+k_values <- 2:5
+gmm_plot_list <- list()
+panel_labels <- c("a) k=2", "b) k=3", "c) k=4", "d) k=5")
+
+for (i in seq_along(k_values)) {
+  k_val <- k_values[i]
+  
+  # Run GMM with the current k value
+  gmm_result <- Mclust(pca_data, G = k_val)
+  
+  # Print summary
+  cat("\nk =", k_val, "- Model:", gmm_result$modelName, "\n")
+  cat("BIC:", gmm_result$bic, "\n")
+  cat("Number of clusters:", gmm_result$G, "\n")
+  print(table(gmm_result$classification))
+  
+  # Store clustering results in a temporary data frame to force evaluation
+  plot_data <- eigenvec_data
+  plot_data$cluster <- factor(gmm_result$classification)
+  
+  # Use specific colors and labels based on k value
+  if (k_val == 2) {
+    # k=2: group 1 is HEMP, group 2 is MJ
+    # Legend order: HEMP, MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("1", "2"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$mj),
+                                c("1", "2"))
+    current_labels <- setNames(c("HEMP", "MJ"), c("1", "2"))
+  } else if (k_val == 3) {
+    # k=3: group 1 is HC_HEMP, group 2 is MJ, group 3 is HEMP
+    # Legend order: HEMP, HC_HEMP, MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("3", "1", "2"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$mj),
+                                c("3", "1", "2"))
+    current_labels <- setNames(c("HEMP", "HC_HEMP", "MJ"), c("3", "1", "2"))
+  } else if (k_val == 4) {
+    # k=4: group 1 is HC_HEMP_2, group 2 is MJ, group 3 is HEMP, group 4 is HC_HEMP_1
+    # Legend order: HEMP, HC_HEMP_1, HC_HEMP_2, MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("3", "4", "1", "2"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$hc_hemp_2, cb_colors$mj),
+                                c("3", "4", "1", "2"))
+    current_labels <- setNames(c("HEMP", "HC_HEMP_1", "HC_HEMP_2", "MJ"), c("3", "4", "1", "2"))
+  } else if (k_val == 5) {
+    # k=5: group 1 is 'sativa' MJ, group 2 is 'indica' MJ, group 3 is HEMP, group 4 is HC_HEMP_1, group 5 is HC_HEMP_2
+    # Legend order: HEMP, HC_HEMP_1, HC_HEMP_2, 'sativa' MJ, 'indica' MJ
+    plot_data$cluster <- factor(plot_data$cluster, levels = c("3", "4", "5", "1", "2"))
+    current_colors <- setNames(c(cb_colors$hemp, cb_colors$hc_hemp_1, cb_colors$hc_hemp_2, friendly7_palette[2], friendly7_palette[3]),
+                                c("3", "4", "5", "1", "2"))
+    current_labels <- setNames(c("HEMP", "HC_HEMP_1", "HC_HEMP_2", "'sativa' MJ", "'indica' MJ"), c("3", "4", "5", "1", "2"))
+  } else {
+    current_colors <- setNames(friendly7_palette[1:k_val], levels(plot_data$cluster))
+    current_labels <- NULL
+  }
+  
+  p <- ggplot(plot_data, aes(x = PC1, y = PC2, color = cluster)) +
+    geom_text(aes(label = FID), vjust = 1, hjust = 1, size = 2.5) +
+    labs(title = panel_labels[i], 
+         x = "PC1: 9.1%", 
+         y = "PC2: 7.6%", 
+         color = "Group") +
+    scale_color_manual(values = current_colors, labels = current_labels) +
+    theme_minimal() +
+    theme(
+      text = element_text(size = 10),
+      plot.title = element_text(size = 11, face = "bold"),
+      legend.position = "right"
+    )
+  
+  # Force evaluation by printing
+  print(p)
+  
+  # Store the plot
+  gmm_plot_list[[i]] <- p
+}
+
+# Arrange all 4 plots in a 2x2 grid and save as A4 PNG
+gmm_combined <- grid.arrange(grobs = gmm_plot_list, ncol = 2)
+
+# Save as A4-sized PNG (21 x 29.7 cm)
+ggsave("gmm-clustering-k2-k5.png", 
+       plot = gmm_combined, 
+       width = 21, 
+       height = 29.7, 
+       units = "cm", 
+       dpi = 600, 
+       bg = "white")
+
+cat("\nGMM clustering plot saved as 'gmm-clustering-k2-k5.png'\n")
 ```
-
-# Visualize with Clustree
-
-```{r}
-clustree(df, prefix = "k")
-
-```
-
-
-# Hierarchical clustering using Euclidean distance
-
-```{r}
-dist_matrix <- dist(eigenvec_data[, 3:ncol(eigenvec_data)], method = "euclidean")
-hc <- hclust(dist_matrix, method = "ward.D2")
-```
-
-```{r}
-labels <- eigenvec_data$IID  # Replace with the appropriate column name if needed
-
-```
-
-# Plot the dendrogram
-
-```{r}
-plot(hc, labels = labels)
-rect.hclust(hc, k = 4, border = 2:5)  # Cut tree into 4 groups
-```
-# make it bigger
-
-```{r}
-# Perform hierarchical clustering
-dist_matrix <- dist(eigenvec_data[, 3:ncol(eigenvec_data)])  # Adjust based on your data
-hc <- hclust(dist_matrix, method = "ward.D2")
-
-# Open a new plotting window with a larger size (make it 3x bigger)
-dev.new(width = 15, height = 15)  # Adjust width and height to increase plot size
-
-# Adjust plot margins (if necessary) to accommodate larger plot
-par(mar = c(8, 8, 4, 2))  # Increase margins
-
-# Plot the dendrogram with custom labels, and make the text smaller (cex < 1)
-plot(hc, labels = labels, cex = 0.5)  # 'cex = 0.5' makes the text smaller
-
-# Cut the tree into 4 groups
-rect.hclust(hc, k = 2, border = 2:5)
-
-
-```
-
