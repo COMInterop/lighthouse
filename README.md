@@ -2,7 +2,7 @@
 
 Hello,
 
-Here, you may find the code used to make diploid assemblies from ultra-long ONT R9 libraries, with Hi-C phasing and scaffolding, as described in our preprint, where we assembled 8 Cannabis haplotypes: (citation).
+Here, you may find the code used to make diploid assemblies from ultra-long ONT R9 libraries, with Hi-C phasing and scaffolding, as described in our preprint, where we assembled 8 Cannabis haplotypes: (citation). The assemblies and annotations are available from https://doi.org/10.5281/zenodo.16456638. 
 
 In re: HMW DNA, our samples were prepared from isolated nuclei, and then size-selected above 50kb on the Blue Pippin. If you don't have access to one, there are selective precipitation kits that eliminate some short fragments. But the Blue Pippin is much more effective. 
 
