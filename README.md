@@ -69,7 +69,7 @@ The pipeline requires manual evaluation at several points. After 6-newdir.sh com
 
 This process is repeated after 14-per-chr-dotplot.sh, only in this case the edits are made directly to the ${CHR_NAME}-${hap}-contigs-revised-2.txt files. 
 
-The remainder should be fairly self-explanatory. It is an iterative process that requires a lot of squinting at dotplots. However, if you have ultra-long libraries to start with, it is more-or-less straightforward to see which are the good contigs and which are the noise scraps. 
+The remainder should be fairly self-explanatory. It is an iterative process that requires a lot of squinting at dotplots. However, if you have ultra-long libraries to start with, it is more-or-less straightforward to see which are the good contigs and which are the noisy scraps. 
 
 The result from this pipeline will be a small number of scaffolds per chromosome, sometimes as few as two, but sometimes as many as six or eight. To condense them into pseudomolecules, we arranged and concatenated them manually in Geneious Prime.
 
