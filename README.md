@@ -2,13 +2,13 @@
 
 Hello,
 
-Here, you may find the code used to make diploid assemblies from ultra-long ONT R9 libraries, with Hi-C phasing and scaffolding, as described in our preprint, where we assembled 8 Cannabis haplotypes: [(citation)](https://www.biorxiv.org/content/10.64898/2026.01.19.700373v1). The assemblies and annotations are available from https://doi.org/10.5281/zenodo.16456638. 
+Here, you may find the code used to make diploid assemblies from ultra-long ONT R9 libraries, with Hi-C phasing and scaffolding, as described in our [preprint](https://www.biorxiv.org/content/10.64898/2026.01.19.700373v1), where we assembled 8 Cannabis haplotypes. The assemblies and annotations are available on [Zenodo](https://doi.org/10.5281/zenodo.16456638). 
 
 In re: HMW DNA, our samples were prepared from isolated nuclei, and then size-selected above 50kb on the Blue Pippin. If you don't have access to one, there are selective precipitation kits that eliminate some short fragments. But the Blue Pippin is much more effective. 
 
 The contigs are created with PECAT, which does haplotype-aware error correction. We include a sample config file which has comments on the optimized parameters. You will need to remove the #comment lines from the .cfg prior to using it. 
 
-Once you have diploid contigs, the tricky bit is phasing them with Hi-C libraries. Here, we begin by binning psuedohaploid contigs among chromosomes using a reference, and then assembling them to pseudomolecules with HapHiC. Next, dual contigs are binned among the pseudohaps to create 10 piles of contigs. Each pile is then phased, typically to chromosome scale, with GreenHill. Greenhill advances the theory of Falcon-Phase, and also incorporates the long reads. It is also able to incorporate a typical paired-end library, but we have not done so. The paper is worth reading: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-03006-8
+Once you have diploid contigs, the tricky bit is phasing them with Hi-C libraries. Here, we begin by binning psuedohaploid contigs among chromosomes using a reference, and then assembling them to pseudomolecules with HapHiC. Next, dual contigs are binned among the pseudohaps to create 10 piles of contigs. Each pile is then phased, typically to chromosome scale, with GreenHill. Greenhill advances the theory of Falcon-Phase, and also incorporates the long reads. It is also able to incorporate a typical paired-end library, but we have not done so. The [paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-03006-8) is worth reading.
 
 However: Greenhill does not always orient contigs correctly, and also necessarily trims homologous contigs to equal length as part of its process. Therefore, the dual GreenHill scaffolds are used to again bin each chromosome's pile of dual contigs into Haplotype 1 and Haplotype 2. 
 
